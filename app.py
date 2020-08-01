@@ -1,4 +1,4 @@
-from flask import Flask , render_template , flash ,redirect, url_for , session, logging, request
+from flask import Flask , render_template, session , flash ,redirect, url_for , session, logging, request
 from data import Articles
 from flask_mysqldb import MySQL 
 from wtforms import Form, StringField , TextAreaField, PasswordField , validators
@@ -70,6 +70,48 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form = form)
 
+# user login 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # get username and passsword from form posted
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        # create a cursor 
+        cur = mysql.connection.cursor()
+
+        # get user by username 
+        result = cur.execute("SELECT * FROM users WHERE username = %s ", [username])
+
+        # check if the is any row found 
+        if result > 0:
+            # get stored hash  
+            data = cur.fetchone()
+            password = data['password']
+
+            # compare passwords 
+            if sha256_crypt.verify(password_candidate, password):
+                # app.logger.info('PASSWORD MATCHED')
+                session['logged_in'] = True 
+                session['username'] = username 
+
+                flash('You are now logged in' , 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                error = 'invalid login'
+                return render_template('login.html', error=error)
+            # close connection 
+            cur.close()
+        else:
+            error = 'username not found'
+            return render_template('login.html', error = error)
+
+    return render_template('login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 if __name__ == '__main__':
     app.secret_key='secret123'
