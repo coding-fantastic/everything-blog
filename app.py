@@ -17,22 +17,27 @@ mysql = MySQL(app)
 
 Articles = Articles()
 
+# index  
 @app.route('/')
 def index():
     return render_template('home.html')
 
+# about 
 @app.route('/about')
 def about():
     return render_template('about.html')
 
+# articles 
 @app.route('/articles')
 def articles():
     return render_template('articles.html', articles = Articles)
 
+# single article 
 @app.route('/article/<string:id>/')
 def article(id):
     return render_template('article.html', id=id)
 
+# register form class   
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('username', [validators.Length(min=4, max=25)])
@@ -43,7 +48,7 @@ class RegisterForm(Form):
         ])
     confirm = PasswordField('Confirm Password')
 
-
+# user register 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
     form = RegisterForm(request.form)
@@ -109,6 +114,14 @@ def login():
 
     return render_template('login.html')
 
+# logout 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out' , 'success')
+    return redirect(url_for('login'))
+
+# dashboard  
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
