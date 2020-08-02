@@ -3,10 +3,17 @@
 
 {% block body %}
     
-    <div class="jumbotron jumbotron-fluid">
+    <div class="jumbotron jumbotron-fluid text-center">
         <div class="container">
           <h1 class="display-4">My app</h1>
           <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+          
+          {% if session.logged_in == NULL %}
+            <a href="/register" class="btn btn-primary btn-lg">Register</a>
+            <a href="/login" class="btn btn-success btn-lg">Login</a>
+            
+          {% endif %}
+            
         </div>
       </div>
 {% endblock body %}
